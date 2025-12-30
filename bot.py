@@ -38,8 +38,13 @@ ADMIN_IDS = []  # Пример: [123456789, 987654321]
 # Состояния для ConversationHandler
 WAITING_EMAIL = 1
 
-# Имя файла Excel
-EXCEL_FILE = "bot_data.xlsx"
+# Имя файла Excel (в постоянном хранилище /data)
+DATA_DIR = "/data"
+EXCEL_FILE = os.path.join(DATA_DIR, "bot_data.xlsx")
+DB_FILE = os.path.join(DATA_DIR, "bot_database.db")
+
+# Создаём папку /data, если её нет
+os.makedirs(DATA_DIR, exist_ok=True)
 
 # Категории товаров с описаниями (для карусели)
 PRODUCT_CATEGORIES = [
@@ -83,7 +88,7 @@ PRODUCT_CATEGORIES = [
 
 # Инициализация базы данных
 def init_db():
-    conn = sqlite3.connect("bot_database.db")
+    conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
 
     # Таблица пользователей
@@ -236,7 +241,7 @@ def save_coffee_to_excel(coffee_id, user_id, username=None, first_name=None):
 
 # Функции для работы с БД
 def save_user(user_id, username=None, first_name=None, last_name=None):
-    conn = sqlite3.connect("bot_database.db")
+    conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -252,7 +257,7 @@ def save_user(user_id, username=None, first_name=None, last_name=None):
 
 
 def save_email(user_id, email):
-    conn = sqlite3.connect("bot_database.db")
+    conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -274,7 +279,7 @@ def save_email(user_id, email):
 
 
 def issue_coffee(user_id):
-    conn = sqlite3.connect("bot_database.db")
+    conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -299,7 +304,7 @@ def issue_coffee(user_id):
 
 
 def get_statistics():
-    conn = sqlite3.connect("bot_database.db")
+    conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM users")
     total_users = cursor.fetchone()[0]
